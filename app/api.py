@@ -3,6 +3,8 @@ import uuid
 from typing import Literal
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from app.database import get_tickets, update_ticket_status
 from app.graph import graph
@@ -127,3 +129,31 @@ def update_ticket(ticket_id: int, request: StatusUpdate):
         "ticket_id": ticket_id,
         "status": request.status
     }
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "service": "fixflow-api"}
+
+# Optional: Serve built frontend if present (e.g. unified Docker/fullstack deployment)
+frontend_dist_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))
+if os.path.exists(frontend_dist_dir) and os.path.exists(os.path.join(frontend_dist_dir, "index.html")):
+    assets_dir = os.path.join(frontend_dist_dir, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/")
+    def serve_root():
+        return FileResponse(os.path.join(frontend_dist_dir, "index.html"))
+
+    @app.get("/{full_path:path}")
+    def serve_frontend_spa(full_path: str):
+        if full_path.startswith("tickets") or full_path in ("docs", "openapi.json", "redoc", "health"):
+            return None
+        candidate = os.path.join(frontend_dist_dir, full_path)
+        if os.path.isfile(candidate):
+            return FileResponse(candidate)
+        return FileResponse(os.path.join(frontend_dist_dir, "index.html"))
+else:
+    @app.get("/")
+    def api_root():
+        return {"status": "ok", "message": "FixFlow API is running. Visit /docs for interactive documentation."}
