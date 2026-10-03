@@ -1,0 +1,16 @@
+venv/
+.venv/
+env/
+node_modules/
+frontend/node_modules/
+fixflow-frontend/
+frontend/dist/
+dist/
+.git/
+.env*
+*.pyc
+__pycache__/
+fixflow.db
+*.sqlite
+*.sqlite3
+.pytest_cache/
