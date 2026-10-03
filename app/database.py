@@ -1,7 +1,16 @@
 import os
 import sqlite3
 
-DATABASE_PATH = os.environ.get("DATABASE_PATH", "fixflow.db")
+DATABASE_PATH = os.environ.get("DATABASE_PATH")
+if not DATABASE_PATH:
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        DATABASE_PATH = "/tmp/fixflow.db"
+    else:
+        DATABASE_PATH = "fixflow.db"
+
+db_dir = os.path.dirname(DATABASE_PATH)
+if db_dir:
+    os.makedirs(db_dir, exist_ok=True)
 
 connection = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 

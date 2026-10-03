@@ -1,0 +1,14 @@
+[project]
+name = "fixflow"
+version = "1.0.0"
+dependencies = [
+    "langgraph",
+    "langchain-groq",
+    "python-dotenv",
+    "fastapi",
+    "uvicorn",
+    "pydantic"
+]
+
+[tool.vercel]
+entrypoint = "app.api:app"

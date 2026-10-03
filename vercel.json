@@ -1,11 +1,40 @@
 {
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/dist",
-  "framework": "vite",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "vite"
+    },
+    "api": {
+      "root": ".",
+      "entrypoint": "app/api.py",
+      "framework": "fastapi"
+    }
+  },
   "rewrites": [
     {
+      "source": "/tickets/(.*)",
+      "destination": { "service": "api" }
+    },
+    {
+      "source": "/tickets",
+      "destination": { "service": "api" }
+    },
+    {
+      "source": "/health",
+      "destination": { "service": "api" }
+    },
+    {
+      "source": "/docs",
+      "destination": { "service": "api" }
+    },
+    {
+      "source": "/openapi.json",
+      "destination": { "service": "api" }
+    },
+    {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": { "service": "frontend" }
     }
   ]
 }

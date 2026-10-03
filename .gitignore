@@ -34,3 +34,5 @@ fixflow-frontend/
 Thumbs.db
 .vscode/
 .idea/
+.vercel
+.env*
